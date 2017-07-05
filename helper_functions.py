@@ -5,7 +5,7 @@ from glob import glob
 from utils import *
 from sklearn import preprocessing
 from skimage.transform import resize
-from tensorflow.examples.tutorials.mnist import input_data
+# from tensorflow.examples.tutorials.mnist import input_data
 import numpy as np
 
 
@@ -81,3 +81,23 @@ def load_imgs(path):
 
 # resize_mnist('./MNIST_data',shape=(32,32))
 # resize_imgs('../data/','simsun80_norm.npy',(32,32,1))
+
+def save_as_npy(data_path,filename,shape):
+    process_batchsize = 5000
+    img_files = glob(os.path.join(data_path, "*.jpg"))
+    imgs = []
+    # imgs = [imread(img_file).astype(np.float32) for img_file in img_files]
+    print("processing ")
+    for i in range(process_batchsize):
+        if i % 100 ==0:
+            print (i)
+        img = imread(img_files[i]).astype(np.float32)
+        img = img/255.0
+        img = resize(img, shape).astype(np.float32)
+        imgs.append(img)
+
+    np.random.shuffle(imgs)
+    name = data_path+filename+'.npy'
+    np.save(name,np.array(imgs).astype(np.float32))
+
+# save_as_npy('./data/0005/','resize_rescale',shape=(64,32,3))

@@ -117,3 +117,6 @@ def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=
             return tf.matmul(input_, matrix) + bias, matrix, bias
         else:
             return tf.matmul(input_, matrix) + bias
+
+def mse(x,y):
+    return 0.5 * tf.reduce_mean(tf.squared_difference(x, y))

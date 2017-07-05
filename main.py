@@ -2,6 +2,7 @@ import os
 import numpy as np
 
 from model_my import MYDCGAN
+from model_lsgan import LSGAN
 from utils import pp, visualize, to_json
 
 import tensorflow as tf
@@ -14,6 +15,8 @@ flags.DEFINE_float("beta1", 0.5, "Momentum term of adam [0.5]")
 flags.DEFINE_integer("train_size", np.inf, "The size of train images [np.inf]")
 flags.DEFINE_integer("batch_size", 64, "The size of batch images [64]")
 flags.DEFINE_integer("image_size", 80, "The size of image to use (will be center cropped) [80]")
+flags.DEFINE_integer("image_width", 80, "The width of image to use [80]")
+flags.DEFINE_integer("image_height", 80, "The height of image to use [80]")
 flags.DEFINE_integer("output_size", 80, "The size of the output images to produce [80]")
 flags.DEFINE_integer("c_dim", 1, "Dimension of image color. [1]")
 flags.DEFINE_integer("d_iters",2,"update D d_iters times while update G onece. [2]")
@@ -35,10 +38,21 @@ def main(_):
         os.makedirs(FLAGS.sample_dir)
 
     with tf.Session() as sess:
-        dcgan = MYDCGAN(sess,
-                      img_size=FLAGS.image_size,
+        # dcgan = MYDCGAN(sess,
+        #               img_size=(FLAGS.image_width, FLAGS.image_height),
+        #               # img_size= False.image_size,
+        #               batch_size=FLAGS.batch_size,
+        #               c_dim=FLAGS.c_dim,                  #color dim:1(gray channel)
+        #               dataset_name=FLAGS.dataset,
+        #               is_crop=FLAGS.is_crop,    #crop boarder
+        #               checkpoint_dir=FLAGS.checkpoint_dir,  #log dir
+        #               sample_dir=FLAGS.sample_dir)
+
+        dcgan = LSGAN(sess,
+                      img_size=(FLAGS.image_width, FLAGS.image_height),
+                      # img_size= False.image_size,
                       batch_size=FLAGS.batch_size,
-                      c_dim=1,                  #color dim:1(gray channel)
+                      c_dim=FLAGS.c_dim,                  #color dim:1(gray channel)
                       dataset_name=FLAGS.dataset,
                       is_crop=FLAGS.is_crop,    #crop boarder
                       checkpoint_dir=FLAGS.checkpoint_dir,  #log dir

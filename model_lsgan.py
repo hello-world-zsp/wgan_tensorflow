@@ -5,7 +5,7 @@ import time
 from ops import *
 from helper_functions import *
 
-class MYDCGAN (object):
+class LSGAN (object):
     def __init__(self, sess, img_size = 80, is_crop = True,
                  batch_size=100, sample_size = 64, output_size = 80,
                  y_dim=None, z_dim = 100, gf_dim=64, df_dim=16,
@@ -119,9 +119,6 @@ class MYDCGAN (object):
         return h4              # wgan,去掉sigmoid层
 
     def build_model(self):
-        # self.real_images = tf.placeholder(tf.float32, [self.batch_size]
-        #                              + [self.img_size, self.img_size, self.c_dim], name='real_images')
-
         self.real_images = tf.placeholder(tf.float32, [self.batch_size]
                                               + [self.img_size[0], self.img_size[1], self.c_dim], name='real_images')
         self.z = tf.placeholder(tf.float32, [self.batch_size, self.z_dim], name='z')
@@ -133,9 +130,9 @@ class MYDCGAN (object):
 
         self.G_sum = image_summary("G", self.G)
 
-        # wgan loss不用log形式的
-        self.g_loss = -tf.reduce_mean(self.D_fake)
-        self.d_loss = tf.reduce_mean(self.D_fake)-tf.reduce_mean(self.D_real)
+        # lsgan loss
+        self.g_loss = mse(self.D_fake, tf.ones_like(self.D_fake))
+        self.d_loss = mse(self.D_real, tf.ones_like(self.D_real)) + mse(self.D_fake, tf.zeros_like(self.D_fake))
 
         self.g_loss_sum = scalar_summary("g_loss", self.g_loss)
         self.d_loss_sum = scalar_summary("d_loss", self.d_loss)
@@ -154,8 +151,8 @@ class MYDCGAN (object):
     def train(self, config):
         # reals, noises = read_images2(self.c_dim,config)
         # reals = load_mnist('./MNIST_data')
-        # reals = load_imgs('../data/resize_simsun80_norm.npy')
-        reals = load_imgs('./data/0005/resize_rescale.npy')
+        reals = load_imgs('../data/resize_simsun80_norm.npy')
+        # reals = load_imgs('./data/0005/resize_rescale.npy')
 
         # wgan不用基于动量的optimizer
         d_optim = tf.train.RMSPropOptimizer(config.learning_rate).minimize(self.d_loss,var_list=self.d_vars)
